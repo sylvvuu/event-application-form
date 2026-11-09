@@ -44,8 +44,6 @@
   .hint { margin-top: 4px; color: #888; font-size: 12px; }
   .counter { text-align: right; margin-top: 4px; color: #888; font-size: 12px; }
   .counter.warn { color: #e8590c; font-weight: bold; }
-
-  /* 오류(빨강) / 입력 중 안내(주황) / 확인됨(초록) */
   .error { display: none; margin-top: 4px; color: #e03131; font-size: 13px; }
   .field.invalid .error { display: block; }
   .field.invalid input, .field.invalid textarea { border-color: #e03131; }
@@ -56,8 +54,6 @@
   .field.valid input[type="text"],
   .field.valid input[type="email"],
   .field.valid input[type="tel"] { border-color: #2f9e44; }
-
-  /* 제출 시 오류 요약 (화면 위쪽에 고정되어 따라옴) */
   #errSummary {
     display: none;
     position: sticky;
@@ -73,7 +69,6 @@
   }
   #errSummary.show { display: block; }
   #errSummary a { color: #c92a2a; text-decoration: underline; cursor: pointer; }
-
   .privacy {
     background: #f8f9fb;
     border: 1px solid #e1e5ec;
@@ -189,6 +184,12 @@
   <button type="button" class="secondary" id="resetBtn">새 신청서 작성</button>
 </div>
 
+<div class="card" id="savedArea" style="margin-top:16px">
+  <h2 style="font-size:18px;margin:0 0 12px">저장된 신청 내역 (이 브라우저)</h2>
+  <div id="savedList"></div>
+  <button type="button" class="secondary" id="clearBtn" style="margin-top:12px">저장 내역 전체 삭제</button>
+</div>
+
 <script>
   const form = document.getElementById('applyForm');
   const formArea = document.getElementById('formArea');
@@ -206,12 +207,11 @@
   const LABELS = { 'f-name': '이름', 'f-email': '이메일', 'f-phone': '휴대폰', 'f-agree': '개인정보 동의' };
   const INPUTS = { 'f-name': nameInput, 'f-email': emailInput, 'f-phone': phoneInput, 'f-agree': agreeInput };
 
-  const dirty = {};            // 한 번이라도 입력한 칸
-  const noticeTimers = {};     // 입력 중 안내를 자동으로 숨기는 타이머
-  let submitAttempted = false; // 제출을 한 번이라도 시도했는지
-  let typoShownFor = '';       // 오타 안내를 이미 보여 준 이메일
+  const dirty = {};
+  const noticeTimers = {};
+  let submitAttempted = false;
+  let typoShownFor = '';
 
-  // 이메일 흔한 오타 -> 올바른 주소
   const EMAIL_TYPOS = {
     'gmail.con': 'gmail.com', 'gmail.co': 'gmail.com', 'gmial.com': 'gmail.com',
     'gamil.com': 'gmail.com', 'gmai.com': 'gmail.com',
@@ -219,7 +219,6 @@
     'daum.nett': 'daum.net', 'nate.con': 'nate.com', 'outlook.con': 'outlook.com'
   };
 
-  // ---------- 화면 표시 도우미 ----------
   function showNotice(fieldId, msg, persist) {
     const el = document.getElementById('notice-' + fieldId.slice(2));
     clearTimeout(noticeTimers[fieldId]);
@@ -236,7 +235,6 @@
     el.textContent = '';
   }
 
-  // msg가 비어 있으면 통과(초록 체크), 있으면 오류 문구 표시
   function setState(fieldId, msg, showValid) {
     const field = document.getElementById(fieldId);
     document.getElementById('err-' + fieldId.slice(2)).textContent = msg;
@@ -250,14 +248,12 @@
     field.classList.remove('invalid', 'valid');
   }
 
-  // 입력을 시작하면 이전 오류/체크 표시를 지움
   function touch(fieldId) {
     dirty[fieldId] = true;
     resetState(fieldId);
     refreshSummary();
   }
 
-  // ---------- 제출 시 오류 요약 ----------
   function refreshSummary() {
     if (!submitAttempted) return;
     const bad = ORDER.filter(id => document.getElementById(id).classList.contains('invalid'));
@@ -285,7 +281,6 @@
     INPUTS[id].focus({ preventScroll: true });
   }
 
-  // ---------- 입력 중 처리 + 안내 ----------
   nameInput.addEventListener('input', () => {
     const raw = nameInput.value;
     const v = raw
@@ -322,7 +317,6 @@
     touch('f-phone');
   });
 
-  // 질문/요청: 글자 수 표시, 450자부터 남은 글자 수 안내
   function updateCounter() {
     const len = messageInput.value.length;
     if (len >= 450) {
@@ -335,7 +329,6 @@
   }
   messageInput.addEventListener('input', updateCounter);
 
-  // ---------- 상황별 오류 문구 ----------
   function checkName(v) {
     if (!v) return '이름을 입력해 주세요.';
     if (v.length < 2) return '이름은 2자 이상 입력해 주세요.';
@@ -373,7 +366,6 @@
     return checked ? '' : '개인정보 수집·이용에 동의해 주셔야 신청할 수 있어요.';
   }
 
-  // ---------- 칸별 검사 ----------
   function validateEmail(fromSubmit) {
     const v = emailInput.value.trim();
     hideNotice('f-email');
@@ -404,7 +396,6 @@
     return true;
   }
 
-  // 칸을 벗어날 때 그 칸만 바로 검사 (한 번도 입력하지 않은 칸은 건너뜀)
   function blurCheck(id) {
     if (!dirty[id]) return;
     validate(id, false);
@@ -419,12 +410,10 @@
     refreshSummary();
   });
 
-  // ---------- 제출 ----------
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     submitAttempted = true;
 
-    // 소속과 질문/요청은 선택 항목이라 검사하지 않습니다.
     const results = ORDER.map(id => ({ id, ok: validate(id, true) }));
     refreshSummary();
 
@@ -444,12 +433,14 @@
       submittedAt: new Date().toLocaleString('ko-KR')
     };
 
-    // 실제 서버로 보내려면 아래 주석을 풀고 주소를 바꿔 주세요.
-    // fetch('https://your-server.example.com/apply', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(data)
-    // });
+    try {
+      const saved = JSON.parse(localStorage.getItem('applications') || '[]');
+      saved.push(data);
+      localStorage.setItem('applications', JSON.stringify(saved));
+      renderSaved();
+    } catch (err) {
+      console.warn('저장에 실패했어요:', err);
+    }
 
     document.getElementById('summary').textContent =
       '이름: ' + data.name + '\n' +
@@ -481,6 +472,41 @@
     result.style.display = 'none';
     formArea.style.display = 'block';
   });
+
+  function renderSaved() {
+    const list = document.getElementById('savedList');
+    let saved = [];
+    try { saved = JSON.parse(localStorage.getItem('applications') || '[]'); } catch (e) {}
+    list.textContent = '';
+    if (!saved.length) {
+      const p = document.createElement('p');
+      p.textContent = '저장된 내역이 없어요.';
+      p.style.color = '#888';
+      list.appendChild(p);
+      return;
+    }
+    saved.forEach((d, i) => {
+      const box = document.createElement('div');
+      box.style.cssText = 'background:#f8f9fb;border-radius:8px;padding:12px;margin-bottom:10px;font-size:13px;line-height:1.7;white-space:pre-wrap;';
+      box.textContent = (i + 1) + '번\n' +
+        '이름: ' + d.name + '\n' +
+        '소속: ' + (d.org || '(없음)') + '\n' +
+        '이메일: ' + d.email + '\n' +
+        '휴대폰: ' + d.phone + '\n' +
+        '질문/요청: ' + (d.message || '(없음)') + '\n' +
+        '접수 시각: ' + d.submittedAt;
+      list.appendChild(box);
+    });
+  }
+
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if (confirm('저장된 신청 내역을 모두 지울까요?')) {
+      localStorage.removeItem('applications');
+      renderSaved();
+    }
+  });
+
+  renderSaved();
 </script>
 
 </body>
