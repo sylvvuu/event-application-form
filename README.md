@@ -4,7 +4,7 @@
 
 > AI 프로덕트 매니저 과정 2주차 (2026-11-05 ~ 11-06)
 >
-> 진행 순서: **Vercel 단일 HTML** → **Google AI Studio로 고도화** → **Apps Script로 구글 시트 연동**
+> 진행 순서: **Vercel 단일 HTML** → **Google AI Studio로 고도화** → **Apps Script로 구글 시트 연동** → **이벤트 랜딩 페이지 Netlify 배포 + GA4 분석** (11-09)
 
 ## 🔗 바로가기
 
@@ -14,6 +14,7 @@
 | 앱스스크립트 신청서 | Google Apps Script | 구글 시트 | [열기](https://script.google.com/macros/s/AKfycby5RvMl5sFLrRwj95uHMDf4Xw13fSfIBjQW5t7OO6EN3xUg4TuldoArBkIoY9Dgr8Qt/exec) | [`apps-script/form/`](apps-script/form/) |
 | 앱스스크립트 신청자 현황 | Google Apps Script | 구글 시트 (읽기) | 관리자 전용 | [`apps-script/admin/`](apps-script/admin/) |
 | Vercel 신청서 (첫 버전) | Claude + Vercel | Vercel Blob | [열기](https://application-form-five-omega.vercel.app) | [`vercel/`](vercel/) |
+| 연말 이벤트 랜딩 페이지 + GA4 | Claude + Netlify | – (GA4로 행동 데이터 수집) | [열기](https://bright-gumdrop-aea9af.netlify.app/) | [분석 기록](docs/netlify-ga4-분석.md) |
 
 ## 📁 폴더 구조
 
@@ -29,7 +30,8 @@ event-application-form/
 │   ├── form/            신청서 입력 화면 (Code.gs, form.html)
 │   └── admin/           신청자 현황 화면 (Code.gs, index.html)
 ├── docs/
-│   └── 사용자입력_기획안.csv   입력 필드별 규칙·예외·피드백 문구·테스트 현황
+│   ├── 사용자입력_기획안.csv   입력 필드별 규칙·예외·피드백 문구·테스트 현황
+│   └── netlify-ga4-분석.md      Netlify 배포 · GA4 연동 · 고객 데이터 분석
 ├── public/              이미지
 └── index.html           AI 스튜디오 앱 진입 파일
 ```
@@ -51,6 +53,22 @@ event-application-form/
 - 비밀번호 보호
 - 신청자 검색, 상태 변경 (접수완료 / 확인중 / 참석확정 / 취소됨), 삭제
 - CSV 다운로드 (UTF-8 BOM, 엑셀 한글 깨짐 없음)
+
+## 📊 Netlify 배포 + GA4 고객 데이터 분석 (2026-11-09)
+
+신청서를 **브라이트 스킨 연말 이벤트** 랜딩 페이지로 확장해 Netlify에 배포하고, GA4(`G-Q6MEXXK6ZB`)를 연결해 방문자 행동을 분석했습니다.
+
+| 단계 | 이벤트 | 수 |
+|---|---|---|
+| 방문 | `session_start` | 4 |
+| 참여 (10초↑) | `user_engagement` | 4 |
+| 하단까지 스크롤 | `scroll` | 5 (페이지뷰 9 중 55.6%) |
+| 신청서 입력 시작 | `form_start` | 1 (세션 대비 25%) |
+| 응모 완료 | – | 0 (전환 이벤트 미설정) |
+
+- 실시간 보고서 기준 (최근 30분 활성 사용자 6명) · 테스트 트래픽 위주라 연결 검증 목적
+- 다음 단계: `generate_lead` 전환 이벤트 + 키 이벤트 지정, CTA·장바구니 이벤트, UTM 유입 추적
+- 상세: [`docs/netlify-ga4-분석.md`](docs/netlify-ga4-분석.md)
 
 ## ⚖️ 도구별 비교
 
