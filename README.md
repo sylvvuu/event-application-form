@@ -1,54 +1,86 @@
-# 스마트 이벤트 신청서 (Event Application Form)
+# 이벤트 신청서 (Event Application Form)
 
-깃허브 및 Vercel 기반의 단일 HTML 신청서를 구글 AI 스튜디오로 불러와 고도화한 실시간 이벤트 신청 및 관리 시스템입니다.
+같은 **이벤트 신청서**를 세 가지 도구(Google AI Studio · Google Apps Script · Vercel)로 각각 만들어 보고, 만드는 방식·저장소·운영 방법을 비교한 프로젝트입니다.
 
-## 🌟 주요 기능
-1. **신청서 접수 (참가자용)**
-   - 이름 실시간 검증 (한글/영문 2~20자)
-   - 이메일 흔한 오타(`gmail.con`, `naver.con` 등) 자동 교정 제안
-   - 휴대폰 번호 010 자동 하이픈 포맷팅
-   - 500자 질문/요청 글자 수 카운터 및 경고
-   - 개인정보 수집·이용 동의
-   - 오류 요약 및 클릭 시 자동 포커스
+> AI 프로덕트 매니저 과정 2주차 DAY 5 (2026-11-06)
 
-2. **Firebase Firestore 실시간 연동**
-   - 신청서 제출 시 Firestore 클라우드 데이터베이스에 실시간 영구 저장
-   - 관리자 화면에서 `onSnapshot`을 통해 새로고침 없이 실시간으로 신청자 명단 누적
+## 🔗 바로가기
 
-3. **Google 스프레드시트 자동 누적**
-   - Google Apps Script Web App과 연동하여 신청 즉시 구글 시트에 1개 행으로 자동 누적 기록
-   - 관리자 화면에서 웹훅 URL 등록 및 1클릭 테스트, 일괄 동기화 지원
+| 버전 | 도구 | 데이터 저장 | 배포 주소 | 코드 |
+|---|---|---|---|---|
+| AI 스튜디오 신청서 | Google AI Studio | Firestore | [열기](https://formai-automator.ai.studio/) | [`src/`](src/) |
+| 앱스스크립트 신청서 | Google Apps Script | 구글 시트 | [열기](https://script.google.com/macros/s/AKfycby5RvMl5sFLrRwj95uHMDf4Xw13fSfIBjQW5t7OO6EN3xUg4TuldoArBkIoY9Dgr8Qt/exec) | [`apps-script/form/`](apps-script/form/) |
+| 앱스스크립트 신청자 현황 | Google Apps Script | 구글 시트 (읽기) | 관리자 전용 | [`apps-script/admin/`](apps-script/admin/) |
+| Vercel 신청서 | Claude + Vercel | Vercel Blob | [열기](https://application-form-five-omega.vercel.app) | [sylvvuu/application-form](https://github.com/sylvvuu/application-form) |
 
-4. **비밀번호 보호 관리자 대시보드**
-   - 주최자 전용 비밀번호 인증 (초기 기본 비밀번호: `admin1234`)
-   - 신청자 검색, 상태 변경 (접수완료 / 확인중 / 참석확정 / 취소됨)
-   - 신청서 삭제 기능 (Firestore 실시간 동기화)
-   - 엑셀/스프레드시트용 CSV 다운로드 (UTF-8 BOM 적용으로 한글 깨짐 없음)
+## 📁 폴더 구조
 
----
-
-## 🚀 설치 및 로컬 실행
-
-```bash
-# 패키지 설치
-npm install
-
-# 개발 서버 실행 (포트 3000)
-npm run dev
-
-# 프로덕션 빌드
-npm run build
+```
+AI-studio/
+├── src/                 AI 스튜디오 신청서 (React + TypeScript + Firebase)
+│   ├── components/      신청서 화면, 관리자 대시보드
+│   ├── pages/           관리자 페이지
+│   ├── services/        Firestore 저장·조회
+│   └── utils/           입력 검증, 구글 시트 연동, 관리자 인증
+├── apps-script/
+│   ├── form/            신청서 입력 화면 (Code.gs, form.html)
+│   └── admin/           신청자 현황 화면 (Code.gs, index.html)
+├── docs/
+│   └── 사용자입력_기획안.csv   입력 필드별 규칙·예외·피드백 문구·테스트 현황
+├── public/              이미지
+└── index.html           AI 스튜디오 앱 진입 파일
 ```
 
----
+## ✨ 주요 기능 (AI 스튜디오 버전)
 
-## ☁️ 배포 안내
+**신청서 (참가자용)**
+- 이름 실시간 검증 (한글/영문 2~20자)
+- 이메일 오타(`gmail.con`, `naver.con` 등) 자동 교정 제안
+- 휴대폰 번호 자동 하이픈 (010-0000-0000)
+- 질문/요청 500자 카운터, 개인정보 수집·이용 동의
+- 오류 요약 표시 + 클릭 시 해당 칸으로 이동
 
-### 1. 구글 AI 스튜디오 (Google Cloud Run) 배포
-- 구글 AI 스튜디오 화면 우측 상단의 **[Publish]** 버튼을 클릭하여 Cloud Run으로 즉시 배포 가능합니다.
-- (구글 클라우드 프로젝트 및 결제 계정 연결 필요)
+**데이터 저장**
+- 제출 즉시 Firestore에 저장, 관리자 화면에 새로고침 없이 반영 (`onSnapshot`)
+- Apps Script 웹 앱 연동 시 구글 시트에 한 줄씩 자동 누적
 
-### 2. Vercel 배포
-- 깃허브 레포지토리(`sylvvuu/application-form`)를 Vercel과 연동하면 Vite 프로젝트로 자동 감지되어 배포됩니다.
-  - Build Command: `npm run build`
-  - Output Directory: `dist`
+**관리자 대시보드**
+- 비밀번호 보호
+- 신청자 검색, 상태 변경 (접수완료 / 확인중 / 참석확정 / 취소됨), 삭제
+- CSV 다운로드 (UTF-8 BOM, 엑셀 한글 깨짐 없음)
+
+## ⚖️ 도구별 비교
+
+| 기준 | AI 스튜디오 | 앱스스크립트 | Vercel |
+|---|---|---|---|
+| 만드는 방법 | 자연어로 요청 | 코드 붙여넣기 | 코드 작성 후 배포 |
+| 데이터 저장 | Firestore | 구글 시트 | Vercel Blob |
+| 데이터 확인 | Firebase 콘솔 | 시트에서 바로 | 관리자 페이지 |
+| 배포 | Publish 버튼 | 배포 → 웹 앱 | Git 연동 자동 배포 |
+
+## 🛠 실행 방법
+
+### AI 스튜디오 버전 (로컬)
+
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # 프로덕션 빌드 (dist/)
+```
+
+배포는 Google AI Studio 우측 상단 **Publish** (Cloud Run).
+
+### 앱스스크립트 버전
+
+| 폴더 | 파일 | Apps Script에 넣는 법 |
+|---|---|---|
+| `apps-script/form/` | `Code.gs`, `form.html` | Code.gs 붙여넣기 + HTML 파일 `form` 추가 |
+| `apps-script/admin/` | `Code.gs`, `index.html` | Code.gs 붙여넣기 + HTML 파일 `index` 추가 |
+
+- HTML 파일 이름은 코드 속 `'form'` / `'index'`와 **대소문자까지 같아야** 합니다.
+- 코드 수정 후 **배포 → 배포 관리 → ✏️ → 새 버전 → 배포** 해야 주소에 반영됩니다.
+- 신청자 현황 화면은 이름·휴대폰·이메일을 마스킹해서 보여 주고, 검색은 서버에서 원본 값으로 합니다 (2글자 이상).
+
+## 📄 기획 문서
+
+- [`docs/사용자입력_기획안.csv`](docs/사용자입력_기획안.csv) — 원본: [사용자입력_기획안 (구글 시트)](https://docs.google.com/spreadsheets/d/1XDapnSBWFQEHEo3dHSQuDWgl76j3nNqmJ8JVpagLODo/edit)

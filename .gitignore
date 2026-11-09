@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# AI Studio 임시 파일
+.aistudio/
