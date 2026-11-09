@@ -2,7 +2,9 @@
 
 같은 **이벤트 신청서**를 세 가지 도구(Google AI Studio · Google Apps Script · Vercel)로 각각 만들어 보고, 만드는 방식·저장소·운영 방법을 비교한 프로젝트입니다.
 
-> AI 프로덕트 매니저 과정 2주차 DAY 5 (2026-11-06)
+> AI 프로덕트 매니저 과정 2주차 (2026-11-05 ~ 11-06)
+>
+> 진행 순서: **Vercel 단일 HTML** → **Google AI Studio로 고도화** → **Apps Script로 구글 시트 연동**
 
 ## 🔗 바로가기
 
@@ -11,17 +13,18 @@
 | AI 스튜디오 신청서 | Google AI Studio | Firestore | [열기](https://formai-automator.ai.studio/) | [`src/`](src/) |
 | 앱스스크립트 신청서 | Google Apps Script | 구글 시트 | [열기](https://script.google.com/macros/s/AKfycby5RvMl5sFLrRwj95uHMDf4Xw13fSfIBjQW5t7OO6EN3xUg4TuldoArBkIoY9Dgr8Qt/exec) | [`apps-script/form/`](apps-script/form/) |
 | 앱스스크립트 신청자 현황 | Google Apps Script | 구글 시트 (읽기) | 관리자 전용 | [`apps-script/admin/`](apps-script/admin/) |
-| Vercel 신청서 | Claude + Vercel | Vercel Blob | [열기](https://application-form-five-omega.vercel.app) | [sylvvuu/application-form](https://github.com/sylvvuu/application-form) |
+| Vercel 신청서 (첫 버전) | Claude + Vercel | Vercel Blob | [열기](https://application-form-five-omega.vercel.app) | [`vercel/`](vercel/) |
 
 ## 📁 폴더 구조
 
 ```
-AI-studio/
+event-application-form/
 ├── src/                 AI 스튜디오 신청서 (React + TypeScript + Firebase)
 │   ├── components/      신청서 화면, 관리자 대시보드
 │   ├── pages/           관리자 페이지
 │   ├── services/        Firestore 저장·조회
 │   └── utils/           입력 검증, 구글 시트 연동, 관리자 인증
+├── vercel/              첫 버전: 단일 HTML 신청서 (Vercel 배포)
 ├── apps-script/
 │   ├── form/            신청서 입력 화면 (Code.gs, form.html)
 │   └── admin/           신청자 현황 화면 (Code.gs, index.html)
